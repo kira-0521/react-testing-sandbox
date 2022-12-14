@@ -4,6 +4,7 @@ import { act } from "react-dom/test-utils"
 import { AsyncCounter } from "./AsyncCounter"
 
 const BUTTON_TEXT = "AsyncIncrement"
+const LOADING_TEXT = "...Loading"
 
 describe("AsyncCounter", () => {
   test("render", () => {
@@ -45,6 +46,28 @@ describe("AsyncCounter", () => {
         jest.runAllTimers()
       })
       expect(button).toBeEnabled()
+      jest.useRealTimers()
+    })
+  })
+
+  describe("click:count:ローディング UI", () => {
+    test("ボタン押下直後はローディングUIが表示される", () => {
+      render(<AsyncCounter />)
+      const button = screen.getByText(BUTTON_TEXT)
+      fireEvent.click(button)
+      const loading = screen.getByText(LOADING_TEXT)
+      expect(loading).toBeInTheDocument()
+    })
+
+    test("ボタン押下1秒後はローディングUIが非表示になる", () => {
+      jest.useFakeTimers()
+      render(<AsyncCounter />)
+      const button = screen.getByText(BUTTON_TEXT)
+      fireEvent.click(button)
+      act(() => {
+        jest.runAllTimers()
+      })
+      expect(screen.queryByText(LOADING_TEXT)).not.toBeInTheDocument()
       jest.useRealTimers()
     })
   })
