@@ -30,40 +30,22 @@ describe("AsyncCounter", () => {
   describe("click:count:ボタン活性・非活性", () => {
     test("ボタン押下直後はボタンが非活性", () => {
       render(<AsyncCounter />)
-      const button = screen.getByText("AsyncIncrement")
+      const button = screen.getByText(BUTTON_TEXT)
       fireEvent.click(button)
       expect(button).toBeDisabled()
     })
-    test("ボタン押下 1 秒後はボタンが活性", () => {
-      jest.useFakeTimers() /** 時間詐称 */
-      render(<AsyncCounter />)
-      const button = screen.getByText("AsyncIncrement")
-      fireEvent.click(button)
-      act(() => {
-        jest.runAllTimers()
-      })
-      expect(button).not.toBeDisabled()
-      jest.useRealTimers() /** 時を戻そう */
-    })
-  })
 
-  describe("click:count:ローディング UI", () => {
-    test("ボタン押下直後はローディングが表示", () => {
+    test("ボタン押下1秒後はボタンが活性化", () => {
+      jest.useFakeTimers()
       render(<AsyncCounter />)
-      const button = screen.getByText("AsyncIncrement")
-      fireEvent.click(button)
-      expect(screen.queryByText("...Loading")).toBeInTheDocument()
-    })
-    test("ボタン押下直後はローディングが非表示", () => {
-      jest.useFakeTimers() /** 時間詐称 */
-      render(<AsyncCounter />)
-      const button = screen.getByText("AsyncIncrement")
+      const button = screen.getByText(BUTTON_TEXT)
       fireEvent.click(button)
       act(() => {
+        // 全てのマクロタスクとマイクロタスクを処理 => 要するに全ての非同期処理を処理
         jest.runAllTimers()
       })
-      expect(screen.queryByText("...Loading")).not.toBeInTheDocument()
-      jest.useRealTimers() /** 時を戻そう */
+      expect(button).toBeEnabled()
+      jest.useRealTimers()
     })
   })
 })
