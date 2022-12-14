@@ -1,6 +1,9 @@
-import { act, fireEvent, render, screen } from "@testing-library/react"
+import { fireEvent, render, screen } from "@testing-library/react"
+import { act } from "react-dom/test-utils"
 
-import { AsyncCounter } from "./"
+import { AsyncCounter } from "./AsyncCounter"
+
+const BUTTON_TEXT = "AsyncIncrement"
 
 describe("AsyncCounter", () => {
   test("render", () => {
@@ -9,16 +12,18 @@ describe("AsyncCounter", () => {
   })
 
   describe("click:count:カウントアップ", () => {
-    test("ボタン押下 1 秒後は 1 カウントアップ", () => {
-      jest.useFakeTimers() /** 時間詐称 */
+    test("ボタン押下1秒後は1カウントアップ", () => {
+      jest.useFakeTimers()
       render(<AsyncCounter />)
-      const button = screen.getByText("AsyncIncrement")
+      const button = screen.getByText(BUTTON_TEXT)
       fireEvent.click(button)
+      // NOTE: Should wrapped react state update event & react rendered.
+      // https://ja.reactjs.org/docs/testing-recipes.html#act
       act(() => {
         jest.runAllTimers()
       })
       screen.getByText("AsyncCount: 1")
-      jest.useRealTimers() /** 時を戻そう */
+      jest.useRealTimers()
     })
   })
 
